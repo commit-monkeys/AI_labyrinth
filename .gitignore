@@ -3,9 +3,9 @@
 
 # Ignore Python cache files
 __pycache__/
+.mypy_cache
 *.pyc
 
 # Ignore IDE settings (optional)
 .vscode/
 .idea/
-
