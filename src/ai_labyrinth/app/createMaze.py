@@ -3,9 +3,13 @@ import numpy as np
 import random
 from queue import Queue
 
+DIMENSION_MULTIPLIER = 2
+OFFSET_IMPAIR = 1
+
 def create_maze(dim: int) -> np.ndarray:
     # Create a grid filled with walls
-    maze = np.ones((dim*2+1, dim*2+1))
+    dimension = dim * DIMENSION_MULTIPLIER + OFFSET_IMPAIR
+    maze = np.ones((dimension, dimension))
 
     # Define the starting point
     x, y = (0, 0)
@@ -45,17 +49,27 @@ def draw_maze(maze:list[list[int]]) -> None:
 
     ax.imshow(maze, cmap=plt.cm.binary, interpolation='nearest')
     
-    # Draw the solution path if it exists
-    # if path is not None:
-    #     x_coords = [x[1] for x in path]
-    #     y_coords = [y[0] for y in path]
-    #     ax.plot(x_coords, y_coords, color='red', linewidth=2)
-    
     ax.set_xticks([])
     ax.set_yticks([])
       
     plt.show()
 
 
-maze = create_maze(6)
-draw_maze(maze)
+def create_dataset(maze_dim: int, dataset_width: int) -> None:
+    dim = maze_dim * DIMENSION_MULTIPLIER + OFFSET_IMPAIR
+    X = np.ones((dataset_width, dim, dim), dtype=np.uint8)
+    Y = np.zeros((dataset_width, dim, dim), dtype=np.uint8)
+
+    for i in range (0, dataset_width):
+        labyrinth = create_maze(maze_dim)
+        Y[i] = labyrinth
+
+    np.savez('dataset_labyrinthes.npz', inputs=X, outputs=Y)
+
+# create_dataset(10, 10)
+
+data = np.load('dataset_labyrinthes.npz')
+X = data['inputs']
+Y = data['outputs']
+print (X[1])
+print (Y[1])
