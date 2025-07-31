@@ -56,5 +56,6 @@ def draw_maze(maze:list[list[int]]) -> None:
       
     plt.show()
 
+
 maze = create_maze(6)
 draw_maze(maze)
