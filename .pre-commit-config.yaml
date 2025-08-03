@@ -1,6 +1,27 @@
 repos:
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.10.0  # or latest stable mypy version
+    rev: v1.17.1
     hooks:
       - id: mypy
+        language: system
         args: [--ignore-missing-imports, --strict]
+  - repo: https://github.com/pre-commit/mirrors-pylint
+    rev: v3.0.0a5
+    hooks:
+      - id: pylint
+        language: system
+        args: ["src/"]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      - id: check-yaml
+      - id: debug-statements
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.7
+    hooks:
+      - id: ruff
+        args: [--fix, --preview]
+      - id: ruff-format
