@@ -7,6 +7,8 @@ dependencies = [
     "pygame>=2.6.1",
     "pylint>=3.3.7",
     "ruff>=0.12.7",
+    "matplotlib>=3.10.5",
+    "tensorflow[and-cuda]>=2.19.0",
 ]
 
 
