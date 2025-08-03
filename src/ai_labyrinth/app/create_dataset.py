@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 from queue import Queue
+import tensorflow as tf 
 
 DIMENSION_MULTIPLIER = 2
 OFFSET_IMPAIR = 1
@@ -35,8 +36,8 @@ def create_maze(dim: int) -> np.ndarray:
             stack.pop()
             
     # Create an entrance and an exit
-    maze[1, 0] = 0
-    maze[-2, -1] = 0
+    maze[1, 0] = 2
+    maze[-2, -1] = 3
 
     return maze
 
@@ -58,18 +59,21 @@ def draw_maze(maze:list[list[int]]) -> None:
 def create_dataset(maze_dim: int, dataset_width: int) -> None:
     dim = maze_dim * DIMENSION_MULTIPLIER + OFFSET_IMPAIR
     X = np.ones((dataset_width, dim, dim), dtype=np.uint8)
-    Y = np.zeros((dataset_width, dim, dim), dtype=np.uint8)
+    Y_labels = np.zeros((dataset_width, dim, dim), dtype=np.uint8)
 
     for i in range (0, dataset_width):
         labyrinth = create_maze(maze_dim)
-        Y[i] = labyrinth
+        Y_labels[i] = labyrinth
 
-    np.savez('dataset_labyrinthes.npz', inputs=X, outputs=Y)
+    num_classes = 4 
+    Y_encoded = tf.keras.utils.to_categorical(Y_labels, num_classes=num_classes) # one hot encode for output of training with 4 labels
+
+    np.savez("dataset_labyrinthes.npz", inputs=X, outputs=Y_encoded)
 
 # create_dataset(10, 10)
 
 data = np.load('dataset_labyrinthes.npz')
 X = data['inputs']
 Y = data['outputs']
-print (X[1])
-print (Y[1])
+print (X[1].shape)
+print (Y[1].shape)
