@@ -1,8 +1,9 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Conv2DTranspose, concatenate
 from tensorflow.keras import Input, Model
-
+from tensorflow.keras.callbacks import EarlyStopping
 from typing import Tuple
+import numpy as np
 
 #Let's create a function for one step of the encoder block, so as to increase the reusability when making custom unets
 
@@ -52,3 +53,17 @@ def unet() -> tf.Model:
   model = Model(inputs = inputs, outputs = outputs, name = 'Unet')
 
   return model
+
+def training(model: tf.Model, train_data: np.ndarray, val_data: np.ndarray) -> None:
+  
+  unet = unet()
+  unet.compile(loss = 'binary_crossentropy',
+            optimizer = 'adam',
+            metrics = ['accuracy'])
+
+  #Defining early stopping to regularize the model and prevent overfitting
+  early_stopping = EarlyStopping(monitor = 'val_loss', patience = 3, restore_best_weights = True)
+
+  #Training the model with 50 epochs (it will stop training in between because of early stopping)
+  unet_history = unet.fit(train_data, validation_data = [val_data], 
+                        epochs = 50, callbacks = [early_stopping])
