@@ -1,5 +1,7 @@
-import pygame
+"""Drawing the labyrinth."""
+
 import sys
+import pygame
 
 # Exemple de matrice (1 = mur, 0 = chemin)
 labyrinthe = [
@@ -7,7 +9,7 @@ labyrinthe = [
     [1, 0, 0, 0, 1, 0, 0, 3],
     [1, 0, 1, 0, 1, 0, 1, 1],
     [1, 0, 1, 0, 0, 0, 0, 1],
-    [1, 2, 1, 1, 1, 1, 1, 1]
+    [1, 2, 1, 1, 1, 1, 1, 1],
 ]
 
 # Paramètres du rendu
@@ -29,17 +31,21 @@ COULEURS = {
     3: ROUGE,
 }
 
+
 def dessiner_labyrinthe(fenetre: pygame.Surface, matrice: list[list[int]]) -> None:
+    """Drawing the labyrinth."""
     for y, ligne in enumerate(matrice):
         for x, case in enumerate(ligne):
             couleur = COULEURS.get(case, BLANC)
             pygame.draw.rect(
                 fenetre,
                 couleur,
-                pygame.Rect(x * TAILLE_CASE, y * TAILLE_CASE, TAILLE_CASE, TAILLE_CASE)
+                pygame.Rect(x * TAILLE_CASE, y * TAILLE_CASE, TAILLE_CASE, TAILLE_CASE),
             )
 
+
 def main() -> None:
+    """Start the app."""
     pygame.init()
     fenetre = pygame.display.set_mode((LARGEUR, HAUTEUR))
     pygame.display.set_caption("Labyrinthe")
@@ -61,7 +67,6 @@ def main() -> None:
     pygame.quit()
     sys.exit()
 
+
 if __name__ == "__main__":
     main()
-
-
