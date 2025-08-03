@@ -9,3 +9,5 @@ __pycache__/
 # Ignore IDE settings (optional)
 .vscode/
 .idea/
+
+*.npz

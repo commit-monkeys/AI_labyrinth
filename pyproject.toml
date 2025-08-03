@@ -2,6 +2,8 @@
 name = "ai_labyrinth"
 version = "0.1.0"
 dependencies = [
+    "matplotlib>=3.10.5",
     "pandas>=2.3.1",
     "pygame>=2.6.1",
+    "tensorflow[and-cuda]>=2.19.0",
 ]

@@ -22,8 +22,8 @@ def baseline_layer(filters: int, inputs: tf.Tensor) -> tf.Tensor:
 def decoder_block(filters: int, connections: tf.Tensor, inputs: tf.Tensor) -> tf.Tensor:
   x = Conv2DTranspose(filters, kernel_size = (2,2), padding = 'same', activation = 'relu', strides = 2)(inputs)
   skip_connections = concatenate([x, connections], axis = -1)
-  x = Conv2D(filters, kernel_size = (2,2), padding = 'same', activation = 'relu')(skip_connections)
-  x = Conv2D(filters, kernel_size = (2,2), padding = 'same', activation = 'relu')(x)
+  x = Conv2D(filters, kernel_size = (3,3), padding = 'same', activation = 'relu')(skip_connections)
+  x = Conv2D(filters, kernel_size = (3,3), padding = 'same', activation = 'relu')(x)
   return x
 
 def unet() -> tf.Model:
@@ -46,7 +46,7 @@ def unet() -> tf.Model:
   d4 = decoder_block(64, s1, d3)
 
   #Setting up the output function for binary classification of pixels
-  outputs = Conv2D(1, 1, activation = 'sigmoid')(d4)
+  outputs = Conv2D(4, 1, activation = 'softmax')(d4)
 
   #Finalizing the model
   model = Model(inputs = inputs, outputs = outputs, name = 'Unet')
