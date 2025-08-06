@@ -4,6 +4,8 @@ from tensorflow.keras import Input, Model
 from tensorflow.keras.callbacks import EarlyStopping
 from typing import Tuple
 import numpy as np
+from sklearn.model_selection import train_test_split
+import argparse
 
 #Let's create a function for one step of the encoder block, so as to increase the reusability when making custom unets
 
@@ -27,9 +29,9 @@ def decoder_block(filters: int, connections: tf.Tensor, inputs: tf.Tensor) -> tf
   x = Conv2D(filters, kernel_size = (3,3), padding = 'same', activation = 'relu')(x)
   return x
 
-def unet() -> tf.Model:
+def unet() -> Model:
   #Defining the input layer and specifying the shape of the images
-  inputs = Input(shape = (224,224,1))
+  inputs = Input(shape = (32,32,1))
 
   #defining the encoder
   s1, p1 = encoder_block(64, inputs = inputs)
@@ -54,10 +56,9 @@ def unet() -> tf.Model:
 
   return model
 
-def training(model: tf.Model, train_data: np.ndarray, val_data: np.ndarray) -> None:
+def training(model: Model, X_train: np.ndarray, y_train: np.ndarray, val_data: np.ndarray) -> None:
   
-  unet = unet()
-  unet.compile(loss = 'binary_crossentropy',
+  model.compile(loss = 'categorical_crossentropy',
             optimizer = 'adam',
             metrics = ['accuracy'])
 
@@ -65,5 +66,50 @@ def training(model: tf.Model, train_data: np.ndarray, val_data: np.ndarray) -> N
   early_stopping = EarlyStopping(monitor = 'val_loss', patience = 3, restore_best_weights = True)
 
   #Training the model with 50 epochs (it will stop training in between because of early stopping)
-  unet_history = unet.fit(train_data, validation_data = [val_data], 
+  unet_history = model.fit(x=X_train, y=y_train, validation_data = val_data, 
                         epochs = 50, callbacks = [early_stopping])
+  
+  model.save_weights('unet_labyrinth.weights.h5')
+
+def create_train_val_test_sets(data_path: str, test_size: float=0.2, val_size: float=0.2, random_state: int=42) -> tuple[int, int, int, int, int, int]:
+    data = np.load(data_path)
+    X = data['inputs']
+    y = data['outputs']
+    # Étape 1: Séparation en entraînement+validation et test
+    X_train_val, X_test, y_train_val, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state
+    )
+
+    # Étape 2: Séparation de l'ensemble entraînement+validation en entraînement et validation
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train_val, y_train_val, test_size=val_size, random_state=random_state
+    )
+
+    # print("Forme des ensembles :")
+    # print(f"X_train: {X_train.shape}, y_train: {y_train.shape}")
+    # print(f"X_val:   {X_val.shape}, y_val:   {y_val.shape}")
+    # print(f"X_test:  {X_test.shape}, y_test:  {y_test.shape}")
+
+    return X_train, X_val, X_test, y_train, y_val, y_test
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Script pour entraîner ou tester un modèle U-Net pour la génération de labyrinthes.")
+    parser.add_argument('action', choices=['train', 'test'], help="L'action à effectuer : 'train' pour l'entraînement, 'test' pour le test.")
+    
+    args = parser.parse_args()
+    
+    # Charger les données (cette partie est commune aux deux actions)
+    # Remplacer par ton code de chargement de données
+    X_train, X_val, X_test, y_train, y_val, y_test = create_train_val_test_sets('dataset_labyrinthes.npz')
+    print(type(X_train))
+    # Créer le modèle
+    model = unet()
+    
+    if args.action == 'train':
+        training(model, X_train, y_train, (X_val, y_val))
+    elif args.action == 'test':
+        # testing(model, X_test, y_test)
+        model.load_weights('unet_labyrinth.weights.h5')
+        prediction = model.predict(X_test)
+        print(prediction[1])
