@@ -8,6 +8,7 @@ dependencies = [
     "pylint>=3.3.7",
     "ruff>=0.12.7",
     "matplotlib>=3.10.5",
+    "scikit-learn>=1.7.1",
     "tensorflow[and-cuda]>=2.19.0",
 ]
 
