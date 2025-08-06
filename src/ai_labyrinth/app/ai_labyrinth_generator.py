@@ -6,6 +6,7 @@ from typing import Tuple
 import numpy as np
 from sklearn.model_selection import train_test_split
 import argparse
+from create_dataset import draw_maze
 
 #Let's create a function for one step of the encoder block, so as to increase the reusability when making custom unets
 
@@ -92,6 +93,18 @@ def create_train_val_test_sets(data_path: str, test_size: float=0.2, val_size: f
 
     return X_train, X_val, X_test, y_train, y_val, y_test
 
+def post_process_prediction(prediction: np.ndarray) -> np.ndarray:
+    clean_maze = np.argmax(prediction, axis=-1)
+
+    return clean_maze
+
+def testing(model: Model, X_test: np.ndarray) -> None:
+        model.load_weights('unet_labyrinth.weights.h5')
+        prediction = model.predict(X_test)
+        clean_maze = post_process_prediction(prediction)
+        for maze in clean_maze:
+           draw_maze(maze)
+        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Script pour entraîner ou tester un modèle U-Net pour la génération de labyrinthes.")
@@ -99,17 +112,11 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     
-    # Charger les données (cette partie est commune aux deux actions)
-    # Remplacer par ton code de chargement de données
     X_train, X_val, X_test, y_train, y_val, y_test = create_train_val_test_sets('dataset_labyrinthes.npz')
-    print(type(X_train))
-    # Créer le modèle
+
     model = unet()
     
     if args.action == 'train':
         training(model, X_train, y_train, (X_val, y_val))
     elif args.action == 'test':
-        # testing(model, X_test, y_test)
-        model.load_weights('unet_labyrinth.weights.h5')
-        prediction = model.predict(X_test)
-        print(prediction[1])
+        testing(model, X_test)
