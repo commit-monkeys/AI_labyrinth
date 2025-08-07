@@ -13,6 +13,7 @@ dependencies = [
 ]
 
 
+
 [tool.pylint]
 # You can use this to ignore specific directories or files
 ignore = ["tests", "migrations"]
