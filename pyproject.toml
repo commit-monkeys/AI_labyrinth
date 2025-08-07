@@ -2,9 +2,27 @@
 name = "ai_labyrinth"
 version = "0.1.0"
 dependencies = [
-    "matplotlib>=3.10.5",
+    "mypy>=1.17.1",
     "pandas>=2.3.1",
     "pygame>=2.6.1",
+    "pylint>=3.3.7",
+    "ruff>=0.12.7",
+    "matplotlib>=3.10.5",
     "scikit-learn>=1.7.1",
     "tensorflow[and-cuda]>=2.19.0",
+    "pre-commit>=4.2.0",
 ]
+
+
+
+[tool.pylint]
+# You can use this to ignore specific directories or files
+ignore = ["tests", "migrations"]
+ignore-patterns = ["^.*_test.py$"]
+
+# Disable specific error messages
+disable = [
+  "no-member"  # to avoid pygame false positives
+]
+
+max-line-length = 100
