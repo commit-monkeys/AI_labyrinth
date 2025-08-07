@@ -3,12 +3,13 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 import random
 from queue import Queue
-import tensorflow as tf 
+import tensorflow as tf
+import os
 
 DIMENSION_MULTIPLIER = 2
 OFFSET_IMPAIR = 1
 
-def create_maze(dim: int) -> np.ndarray:
+def create_maze_DFS(dim: int) -> np.ndarray:
     # Create a grid filled with walls
     dimension = dim * DIMENSION_MULTIPLIER + OFFSET_IMPAIR
     maze = np.ones((dimension, dimension))
@@ -68,8 +69,16 @@ def draw_maze(maze_array: np.ndarray) -> None:
     ax.set_yticklabels([])
     ax.set_title("Generated Labyrinth")
 
-    # Show the plot
-    plt.savefig('my_plot.png')
+    base_filename = 'img/maze'
+    extension = ".png"
+    counter = 1
+    filename = f"{base_filename}{extension}"
+    while os.path.exists(filename):
+        filename = f"{base_filename}_{counter}{extension}"
+        counter += 1
+
+    plt.savefig(filename)
+    plt.close()
 
 
 def create_dataset(maze_dim: int, dataset_width: int) -> None:
@@ -78,7 +87,7 @@ def create_dataset(maze_dim: int, dataset_width: int) -> None:
     Y_labels = np.zeros((dataset_width, 32, 32), dtype=np.uint8)
 
     for i in range (0, dataset_width):
-        labyrinth = create_maze(maze_dim)
+        labyrinth = create_maze_DFS(maze_dim)
         pad_total = 32 - dim # 32 - 21 = 11
         pad_width = ((pad_total // 2, pad_total - pad_total // 2), 
                      (pad_total // 2, pad_total - pad_total // 2))
@@ -90,12 +99,13 @@ def create_dataset(maze_dim: int, dataset_width: int) -> None:
     Y_encoded = tf.keras.utils.to_categorical(Y_labels, num_classes=num_classes) # one hot encode for output of training with 4 labels
 
     np.savez("dataset_labyrinthes.npz", inputs=X, outputs=Y_encoded)
-
+ 
 # maze = create_maze(16)
 # draw_maze(maze)
 
-create_dataset(10, 10)
+create_dataset(10, 1000)
 data = np.load('dataset_labyrinthes.npz')
 X = data['inputs']
 Y = data['outputs']
-
+# print (Y.shape)
+# print(X.shape)
