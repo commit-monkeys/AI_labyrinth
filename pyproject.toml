@@ -10,6 +10,7 @@ dependencies = [
     "matplotlib>=3.10.5",
     "scikit-learn>=1.7.1",
     "tensorflow[and-cuda]>=2.19.0",
+    "pre-commit>=4.2.0",
 ]
 
 
